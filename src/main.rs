@@ -1,6 +1,9 @@
 use macroquad::prelude::{
     draw_poly, get_frame_time, next_frame, screen_height, screen_width, Color, Conf, Vec2,
+    is_key_down, is_key_pressed, KeyCode,
 };
+use std::time::Duration;
+use std::thread;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
@@ -75,11 +78,9 @@ fn random_pos() -> Vec2 {
 
 fn random_color() -> Color {
     let mut rng = rand::thread_rng();
-    // let mut rng = StdRng::from_entropy();
     let r: f32 = rng.gen_range(0.0, 1.0);
     let g: f32 = rng.gen_range(0.0, 1.0);
     let b: f32 = rng.gen_range(0.0, 1.0);
-    // let a: f32 = rng.gen_range(0.5, 1.0);
     return Color::new(r, g, b, 1.0);
 }
 
@@ -87,7 +88,7 @@ fn random_color() -> Color {
 fn window_conf() -> Conf {
     Conf {
         window_title: "StupidSquids".to_owned(),
-        fullscreen: true,
+        fullscreen: false,
         ..Default::default()
     }
 }
@@ -99,15 +100,34 @@ fn render(objs: &mut Vec<VisualObject>) {
     }
 }
 
-#[macroquad::main(window_conf)]
-async fn main() {
+fn gen_objs(len: i32) -> Vec<VisualObject> {
     let mut objs = Vec::new();
-    for _ in 1..NUMBER_OF_OBJECTS {
+    for _ in 1..len {
         objs.push(VisualObject::new_rand());
     }
+    return objs;
+}
 
+// debounce_time in ms
+fn debounced_is_key_down(key: KeyCode, debounce_time: u64) -> bool {
+    let before = is_key_down(key);
+    thread::sleep(Duration::from_millis(debounce_time));
+    let after = is_key_down(key);
+    return before && after;
+
+}
+
+#[macroquad::main(window_conf)]
+async fn main() {
+    let mut objs = gen_objs(NUMBER_OF_OBJECTS);
     loop {
-        // get user inputs
+        if is_key_pressed(KeyCode::Q) {
+            break;
+        }
+
+        if debounced_is_key_down(KeyCode::A, 100) {
+            objs = gen_objs(NUMBER_OF_OBJECTS) // reset position of objects
+        }
         render(&mut objs);
         next_frame().await;
     }
