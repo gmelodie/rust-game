@@ -1,11 +1,11 @@
 use macroquad::prelude::{
-    draw_poly, get_frame_time, next_frame, screen_height, screen_width, Color, Conf, Vec2,
-    is_key_down, is_key_pressed, KeyCode,
+    draw_poly, get_frame_time, is_key_down, is_key_pressed, next_frame, screen_height,
+    screen_width, Color, Conf, KeyCode, Vec2,
 };
-use std::time::Duration;
-use std::thread;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
+use std::collections::HashMap;
+use std::time::{Duration, Instant};
 
 const EARTH_GRAVITY: f32 = 1000.0;
 const RESTITUTION: f32 = 0.6;
@@ -108,24 +108,59 @@ fn gen_objs(len: i32) -> Vec<VisualObject> {
     return objs;
 }
 
-// debounce_time in ms
-fn debounced_is_key_down(key: KeyCode, debounce_time: u64) -> bool {
-    let before = is_key_down(key);
-    thread::sleep(Duration::from_millis(debounce_time));
-    let after = is_key_down(key);
-    return before && after;
+// return a duration which is the time between two frames
+fn time_since(f1: i32, f2: i32) -> Duration {
+    assert!(
+        f2 >= f1,
+        "invalid frame order: f1 {} is not greater or equal than f2 {}",
+        f1,
+        f2
+    );
+    return Duration::from_secs_f32(get_frame_time() * ((f2 - f1) as f32));
+}
 
+// debounce_time in ms
+fn debounced_is_key_down(
+    keys_pressed: &mut HashMap<KeyCode, (bool, i32)>,
+    key: KeyCode,
+    debounce_time: Duration,
+    cur_frame: i32,
+) -> bool {
+    let when_started_being_down = keys_pressed.get(&key).copied().unwrap_or((false, 0));
+
+    if !is_key_down(key) {
+        keys_pressed.insert(key, (false, 0)); // key is no longer or not pressed, reset
+    } else if is_key_down(key) && when_started_being_down.1 == 0 {
+        keys_pressed.insert(key, (true, cur_frame)); // key just got pressed
+    } else {
+        keys_pressed.insert(key, (true, when_started_being_down.1)); // key is still being pressed
+    }
+
+    let first_down_frame = keys_pressed[&key].1;
+    if keys_pressed[&key].0 && time_since(first_down_frame, cur_frame) > debounce_time {
+        keys_pressed.insert(key, (false, 0));
+        return true;
+    }
+    return false;
 }
 
 #[macroquad::main(window_conf)]
 async fn main() {
+    let mut keys_pressed = HashMap::new();
     let mut objs = gen_objs(NUMBER_OF_OBJECTS);
+    let mut frame_num = 0;
     loop {
+        frame_num += 1;
         if is_key_pressed(KeyCode::Q) {
             break;
         }
 
-        if debounced_is_key_down(KeyCode::A, 100) {
+        if debounced_is_key_down(
+            &mut keys_pressed,
+            KeyCode::A,
+            Duration::from_millis(50),
+            frame_num,
+        ) {
             objs = gen_objs(NUMBER_OF_OBJECTS) // reset position of objects
         }
         render(&mut objs);
