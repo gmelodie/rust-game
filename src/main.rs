@@ -25,14 +25,15 @@ fn render(objs: &mut Vec<objects::VisualObject>) {
 async fn main() {
     let mut input = input_manager::InputManager::new();
     let mut objs = objects::gen_objs(objects::NUMBER_OF_OBJECTS);
-    let mut frame_num = 0;
+
+    input.register_key(KeyCode::A);
     loop {
-        frame_num += 1;
+        input.update();
         if is_key_pressed(KeyCode::Q) {
             break;
         }
 
-        if input.is_down(KeyCode::A, frame_num) {
+        if input.debounced_is_key_down(KeyCode::A) {
             objs = objects::gen_objs(objects::NUMBER_OF_OBJECTS) // reset position of objects
         }
         render(&mut objs);

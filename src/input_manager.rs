@@ -1,24 +1,28 @@
 use macroquad::prelude::{
-    get_frame_time, is_key_down, KeyCode,
+    is_key_down, KeyCode,
 };
-use std::time::{Duration};
+use std::time::{Duration, Instant};
 use std::collections::HashMap;
 
+struct KeyState {
+    first_frame: bool,
+    last_repeated: Instant,
+}
+
 pub struct InputManager {
-    keys_pressed: HashMap<KeyCode, (bool, i32)>,
+    keys_pressed: HashMap<KeyCode, KeyState>,
 }
 
-// return a duration which is the time between two frames
-fn time_since(f1: i32, f2: i32) -> Duration {
-    assert!(
-        f2 >= f1,
-        "invalid frame order: f1 {} is not greater or equal than f2 {}",
-        f1,
-        f2
-    );
-    return Duration::from_secs_f32(get_frame_time() * ((f2 - f1) as f32));
-}
+const DEBOUNCE_TIME: f32 = 0.3;
 
+impl Default for KeyState {
+    fn default() -> Self {
+        Self{
+            first_frame: true,
+            last_repeated: Instant::now(),
+        }
+    }
+}
 
 impl InputManager {
     pub fn new() -> InputManager {
@@ -27,31 +31,50 @@ impl InputManager {
         }
     }
     // debounce_time in ms
-    fn debounced_is_key_down(
+    pub fn debounced_is_key_down(
         &mut self,
         key: KeyCode,
-        debounce_time: Duration,
-        cur_frame: i32,
     ) -> bool {
-        let when_started_being_down = self.keys_pressed.get(&key).copied().unwrap_or((false, 0));
 
+        // return false if key is down
         if !is_key_down(key) {
-            self.keys_pressed.insert(key, (false, 0)); // key is no longer or not pressed, reset
-        } else if is_key_down(key) && when_started_being_down.1 == 0 {
-            self.keys_pressed.insert(key, (true, cur_frame)); // key just got pressed
-        } else {
-            self.keys_pressed.insert(key, (true, when_started_being_down.1)); // key is still being pressed
+            return false;
         }
 
-        let first_down_frame = self.keys_pressed[&key].1;
-        if self.keys_pressed[&key].0 && time_since(first_down_frame, cur_frame) > debounce_time {
-            self.keys_pressed.insert(key, (false, 0));
+        let mut key_state = self.keys_pressed.get_mut(&key).unwrap();
+
+        // if key just started being pressed
+        // return immediately
+        if key_state.first_frame {
+            key_state.first_frame = false;
+            return true
+        }
+
+        // if the last time we repeated was
+        // long enough ago, return true and
+        // update last_repeated
+        if key_state.last_repeated.elapsed() > Duration::from_secs_f32(DEBOUNCE_TIME) {
+            key_state.last_repeated = Instant::now();
             return true;
         }
+
         return false;
     }
 
-    pub fn is_down(&mut self, key: KeyCode, cur_frame: i32) -> bool {
-        return self.debounced_is_key_down(key, Duration::from_millis(50), cur_frame);
+    pub fn update(&mut self) {
+        for (key, state) in self.keys_pressed.iter_mut() {
+            if !is_key_down(*key) {
+                // reset first frame
+                state.first_frame = true;
+                state.last_repeated = Instant::now();
+            }
+        }
+    }
+
+    pub fn register_key(&mut self, key: KeyCode) {
+        self.keys_pressed.insert(key, KeyState {
+            first_frame: false,
+            last_repeated: Instant::now(),
+        });
     }
 }
