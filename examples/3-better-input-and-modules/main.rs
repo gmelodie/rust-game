@@ -1,14 +1,9 @@
 mod input_manager;
-
-mod utils;
 mod objects;
-use crate::objects::birds;
-use crate::objects::polygon;
 
 use macroquad::prelude::{
     is_key_pressed, next_frame, Conf, KeyCode,
 };
-
 
 // make window fullscreen
 fn window_conf() -> Conf {
@@ -19,9 +14,9 @@ fn window_conf() -> Conf {
     }
 }
 
-fn render<T: objects::VisualObject>(objs: &mut Vec<T>) {
+fn render(objs: &mut Vec<objects::VisualObject>) {
     for obj in objs {
-        obj.update();
+        obj.update_pos();
         obj.draw();
     }
 }
@@ -29,8 +24,7 @@ fn render<T: objects::VisualObject>(objs: &mut Vec<T>) {
 #[macroquad::main(window_conf)]
 async fn main() {
     let mut input = input_manager::InputManager::new();
-    // let mut polys = polygon::gen_polys(polygon::NUMBER_OF_POLYGONS);
-    let mut birds = birds::gen_birds(birds::NUMBER_OF_BIRDS).await;
+    let mut objs = objects::gen_objs(objects::NUMBER_OF_OBJECTS);
 
     input.register_key(KeyCode::A);
     loop {
@@ -40,9 +34,9 @@ async fn main() {
         }
 
         if input.debounced_is_key_down(KeyCode::A) {
-            birds = birds::gen_birds(birds::NUMBER_OF_BIRDS).await; // reset position of objects
+            objs = objects::gen_objs(objects::NUMBER_OF_OBJECTS) // reset position of objects
         }
-        render(&mut birds);
+        render(&mut objs);
         next_frame().await;
     }
 }

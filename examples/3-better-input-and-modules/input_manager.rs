@@ -13,7 +13,7 @@ pub struct InputManager {
     keys_pressed: HashMap<KeyCode, KeyState>,
 }
 
-const KEY_DEBOUNCE_TIME: f32 = 0.3;
+const DEBOUNCE_TIME: f32 = 0.3;
 
 impl Default for KeyState {
     fn default() -> Self {
@@ -53,7 +53,7 @@ impl InputManager {
         // if the last time we repeated was
         // long enough ago, return true and
         // update last_repeated
-        if key_state.last_repeated.elapsed() > Duration::from_secs_f32(KEY_DEBOUNCE_TIME) {
+        if key_state.last_repeated.elapsed() > Duration::from_secs_f32(DEBOUNCE_TIME) {
             key_state.last_repeated = Instant::now();
             return true;
         }
