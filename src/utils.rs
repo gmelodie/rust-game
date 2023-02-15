@@ -3,10 +3,7 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 pub fn random_pos() -> Vec2 {
-    let mut rng = StdRng::from_entropy();
-    let x: f32 = rng.gen_range(0.0, screen_width());
-    let y: f32 = rng.gen_range(0.0, screen_height());
-    return Vec2::new(x, y);
+    return random_vec2();
 }
 
 pub fn random_color() -> Color {
@@ -17,3 +14,9 @@ pub fn random_color() -> Color {
     return Color::new(r, g, b, 1.0);
 }
 
+pub fn random_vec2() -> Vec2 {
+    let mut rng = StdRng::from_entropy();
+    let x: f32 = rng.gen_range(0.0, screen_width());
+    let y: f32 = rng.gen_range(0.0, screen_height());
+    return Vec2::new(x, y);
+}

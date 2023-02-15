@@ -1,14 +1,11 @@
 mod input_manager;
 
-mod utils;
 mod objects;
+mod utils;
 use crate::objects::birds;
-use crate::objects::polygon;
+// use crate::objects::polygon;
 
-use macroquad::prelude::{
-    is_key_pressed, next_frame, Conf, KeyCode,
-};
-
+use macroquad::prelude::{is_key_pressed, next_frame, Conf, KeyCode};
 
 // make window fullscreen
 fn window_conf() -> Conf {
@@ -34,11 +31,14 @@ async fn main() {
 
     input.register_key(KeyCode::A);
     loop {
+        let new_bird_leader = birds::find_leader(&birds);
+        for bird in birds.iter_mut() {
+            bird.leader = new_bird_leader;
+        }
         input.update();
         if is_key_pressed(KeyCode::Q) {
             break;
         }
-
         if input.debounced_is_key_down(KeyCode::A) {
             birds = birds::gen_birds(birds::NUMBER_OF_BIRDS).await; // reset position of objects
         }
