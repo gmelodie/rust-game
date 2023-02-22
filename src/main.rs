@@ -31,9 +31,10 @@ async fn main() {
 
     input.register_key(KeyCode::A);
     loop {
-        let new_bird_leader = birds::find_leader(&birds);
+        let new_leader = birds::find_leader(&birds);
         for bird in birds.iter_mut() {
-            bird.leader = new_bird_leader;
+            bird.leader_direction = new_leader.direction;
+            bird.leader_pos = new_leader.pos;
         }
         input.update();
         if is_key_pressed(KeyCode::Q) {
