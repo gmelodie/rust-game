@@ -1,6 +1,8 @@
-use macroquad::prelude::{is_key_down, KeyCode};
-use std::collections::HashMap;
+use macroquad::prelude::{
+    is_key_down, KeyCode,
+};
 use std::time::{Duration, Instant};
+use std::collections::HashMap;
 
 struct KeyState {
     first_frame: bool,
@@ -11,11 +13,11 @@ pub struct InputManager {
     keys_pressed: HashMap<KeyCode, KeyState>,
 }
 
-const KEY_DEBOUNCE_TIME: f32 = 0.1;
+const KEY_DEBOUNCE_TIME: f32 = 0.3;
 
 impl Default for KeyState {
     fn default() -> Self {
-        Self {
+        Self{
             first_frame: true,
             last_repeated: Instant::now(),
         }
@@ -29,7 +31,11 @@ impl InputManager {
         }
     }
     // debounce_time in ms
-    pub fn debounced_is_key_down(&mut self, key: KeyCode) -> bool {
+    pub fn debounced_is_key_down(
+        &mut self,
+        key: KeyCode,
+    ) -> bool {
+
         // return false if key is down
         if !is_key_down(key) {
             return false;
@@ -41,7 +47,7 @@ impl InputManager {
         // return immediately
         if key_state.first_frame {
             key_state.first_frame = false;
-            return true;
+            return true
         }
 
         // if the last time we repeated was
@@ -66,12 +72,9 @@ impl InputManager {
     }
 
     pub fn register_key(&mut self, key: KeyCode) {
-        self.keys_pressed.insert(
-            key,
-            KeyState {
-                first_frame: false,
-                last_repeated: Instant::now(),
-            },
-        );
+        self.keys_pressed.insert(key, KeyState {
+            first_frame: false,
+            last_repeated: Instant::now(),
+        });
     }
 }

@@ -55,16 +55,17 @@ async fn main() {
 
         // move
         if is_key_down(KeyCode::Right) {
+            println!("rotating right")
             ship.rotate(5.0);
         }
         if is_key_down(KeyCode::Left) {
-            ship.rotate(-5.0);
+            ship.rotate(5.0);
         }
 
         // rendering
         // TODO: reset game
         // TODO: render(&mut enemies);
-        render(&mut projectiles);
+        // render(&mut projectiles);
         render_one(&mut ship);
         next_frame().await;
     }
