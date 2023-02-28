@@ -1,9 +1,4 @@
-use macroquad::prelude::{
-    draw_poly, get_frame_time, screen_height, screen_width, Color, Vec2, WHITE,
-};
-
-pub const EARTH_GRAVITY: f32 = 1000.0;
-pub const RESTITUTION: f32 = 0.8;
+use macroquad::prelude::Vec2;
 
 pub trait Movable {
     fn update(&mut self);
@@ -23,7 +18,7 @@ pub struct Object {
 
 impl Movable for Object {
     fn update(&mut self) {
-        self.position += self.speed * self.direction;
+        self.position += self.speed * self.direction.normalize();
     }
 }
 impl Object {

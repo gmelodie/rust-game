@@ -1,6 +1,7 @@
 use macroquad::prelude::{screen_height, screen_width, Color, Vec2};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
+use std::f32::consts::PI;
 
 pub fn random_pos() -> Vec2 {
     return random_vec2(
@@ -34,4 +35,8 @@ pub fn random_vec2(min_x: f32, max_x: f32, min_y: f32, max_y: f32) -> Vec2 {
     let x: f32 = rng.gen_range(min_x, max_x);
     let y: f32 = rng.gen_range(min_y, max_y);
     return Vec2::new(x, y);
+}
+
+pub fn deg2rad(degrees: f32) -> f32 {
+    return degrees * PI / 180.0;
 }

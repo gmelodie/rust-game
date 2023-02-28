@@ -1,10 +1,12 @@
 use crate::objects::{Drawable, Movable, Object};
 use crate::projectile::Projectile;
-use macroquad::prelude::{draw_poly, get_frame_time, screen_height, screen_width, Vec2, WHITE};
+use crate::utils::deg2rad;
+use macroquad::prelude::{draw_poly, screen_height, screen_width, Vec2, WHITE};
+use std::f32::consts::PI;
 
 pub struct Ship {
-    object: Object,
-    rotation: f32,
+    pub object: Object,
+    degrees_rotation: f32,
 }
 impl Drawable for Ship {
     fn draw(&self) {
@@ -13,7 +15,7 @@ impl Drawable for Ship {
             self.object.position.y,
             3, // number of sides
             self.object.size,
-            self.rotation, // rotation (doesn't matter)
+            self.degrees_rotation,
             WHITE,
         );
     }
@@ -26,28 +28,20 @@ impl Movable for Ship {
 impl Ship {
     pub fn new() -> Self {
         let position = Vec2::new(screen_width() / 2.0, screen_height() / 2.0);
-        let my_rotation = -45.0;
         let size = 25.0;
-        let direction = Vec2::from_angle(my_rotation);
+        let direction = Vec2::from_angle(PI);
         Self {
             object: Object::new(position, direction, 0.0, size),
-            rotation: my_rotation,
+            degrees_rotation: 180.0,
         }
     }
 
     pub fn rotate(&mut self, degrees: f32) {
-        self.rotation += degrees;
-        self.object.direction = Vec2::from_angle(self.rotation);
+        self.degrees_rotation += degrees;
+        self.object.direction = Vec2::from_angle(deg2rad(self.degrees_rotation));
     }
 
     pub fn shoot(&self) -> Projectile {
-        Projectile {
-            object: Object {
-                position: self.object.position,
-                direction: self.object.direction,
-                speed: 10.0,
-                size: 10.0,
-            },
-        }
+        Projectile::new(self.object.position, self.object.direction)
     }
 }

@@ -1,5 +1,5 @@
 use crate::objects::{Drawable, Movable, Object};
-use macroquad::prelude::{draw_circle, WHITE};
+use macroquad::prelude::{draw_circle, Vec2, WHITE};
 
 pub struct Projectile {
     pub object: Object,
@@ -18,5 +18,17 @@ impl Drawable for Projectile {
 impl Movable for Projectile {
     fn update(&mut self) {
         self.object.update();
+    }
+}
+impl Projectile {
+    pub fn new(my_position: Vec2, my_direction: Vec2) -> Self {
+        Self {
+            object: Object {
+                position: my_position,
+                direction: my_direction,
+                speed: 10.0,
+                size: 10.0,
+            },
+        }
     }
 }
