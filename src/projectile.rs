@@ -3,6 +3,7 @@ use macroquad::prelude::{draw_circle, Vec2, WHITE};
 
 pub struct Projectile {
     pub object: Object,
+    pub dead: bool,
 }
 
 impl Drawable for Projectile {
@@ -27,8 +28,9 @@ impl Projectile {
                 position: my_position,
                 direction: my_direction,
                 speed: 10.0,
-                size: 10.0,
+                size: 5.0,
             },
+            dead: false,
         }
     }
 }

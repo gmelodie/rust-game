@@ -1,3 +1,4 @@
+use crate::enemy::Enemy;
 use crate::objects::{Drawable, Movable, Object};
 use crate::projectile::Projectile;
 use crate::utils::deg2rad;
@@ -7,6 +8,7 @@ use std::f32::consts::PI;
 pub struct Ship {
     pub object: Object,
     degrees_rotation: f32,
+    pub lives: i32,
 }
 impl Drawable for Ship {
     fn draw(&self) {
@@ -33,6 +35,7 @@ impl Ship {
         Self {
             object: Object::new(position, direction, 0.0, size),
             degrees_rotation: 180.0,
+            lives: 10,
         }
     }
 
@@ -43,5 +46,17 @@ impl Ship {
 
     pub fn shoot(&self) -> Projectile {
         Projectile::new(self.object.position, self.object.direction)
+    }
+
+    pub fn collided(&self, enemy: &Enemy) -> bool {
+        let p_max_x = self.object.position.x + self.object.size / 2.0;
+        let p_min_x = self.object.position.x - self.object.size / 2.0;
+        let p_max_y = self.object.position.y + self.object.size / 2.0;
+        let p_min_y = self.object.position.y - self.object.size / 2.0;
+
+        return enemy.object.position.x >= p_min_x
+            && enemy.object.position.x <= p_max_x
+            && enemy.object.position.y >= p_min_y
+            && enemy.object.position.y <= p_max_y;
     }
 }

@@ -10,7 +10,6 @@ use enemy::Enemy;
 use ship::Ship;
 
 use macroquad::prelude::{is_key_down, is_key_pressed, next_frame, Conf, KeyCode};
-use std::collections::HashMap;
 
 // make window fullscreen
 fn window_conf() -> Conf {
@@ -46,6 +45,8 @@ async fn main() {
     let mut projectiles = Vec::new();
     let mut enemies = Vec::new();
 
+    let mut points = 0;
+
     let mut frame_number = 0;
     loop {
         input.update();
@@ -72,11 +73,41 @@ async fn main() {
             enemies.push(Enemy::new(ship.object.position));
         }
 
-        // rendering
-        // TODO: reset game
         render_one(&mut ship);
         render(&mut projectiles);
         render(&mut enemies);
+
+        // check collisions of enemies and projectiles
+        for enemy in enemies.iter_mut() {
+            for projectile in projectiles.iter_mut() {
+                if enemy.collided(&projectile) {
+                    enemy.dead = true;
+                    projectile.dead = true;
+                    points += 1;
+                    println!("some dude died");
+                    println!("points: {}", points);
+                }
+            }
+        }
+
+        // check collisions of enemies and ship
+        for enemy in enemies.iter_mut() {
+            if ship.collided(enemy) {
+                ship.lives -= 1;
+                enemy.dead = true;
+                println!("hit! center hit! lives: {}", ship.lives);
+            }
+        }
+
+        // retain every enemy and projectile
+        // that is not dead
+        enemies.retain(|e| e.dead == false);
+        projectiles.retain(|p| p.dead == false);
+
+        if ship.lives <= 0 {
+            println!("you lost");
+            break;
+        }
         next_frame().await;
         frame_number += 1;
     }

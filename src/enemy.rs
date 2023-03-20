@@ -1,9 +1,11 @@
 use crate::objects::{Drawable, Movable, Object};
+use crate::projectile::Projectile;
 use crate::utils;
 use macroquad::prelude::{draw_poly, screen_height, screen_width, Color, Vec2};
 
 pub struct Enemy {
-    object: Object,
+    pub object: Object,
+    pub dead: bool,
     color: Color,
 }
 impl Drawable for Enemy {
@@ -40,9 +42,22 @@ impl Enemy {
                 speed: 2.5,
                 size: 30.0,
             },
+            dead: false,
             color: utils::random_color(),
         }
     }
-    //TODO: enemy was destroyed
-    //TODO: enemy reached ship
+
+    pub fn collided(&self, projectile: &Projectile) -> bool {
+        //TODO: smart-ish: round position
+        //TODO: smarter: consider radius of projectile + size of enemy
+        let p_max_x = self.object.position.x + self.object.size / 2.0;
+        let p_min_x = self.object.position.x - self.object.size / 2.0;
+        let p_max_y = self.object.position.y + self.object.size / 2.0;
+        let p_min_y = self.object.position.y - self.object.size / 2.0;
+
+        return projectile.object.position.x >= p_min_x
+            && projectile.object.position.x <= p_max_x
+            && projectile.object.position.y >= p_min_y
+            && projectile.object.position.y <= p_max_y;
+    }
 }
