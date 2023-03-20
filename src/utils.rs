@@ -1,4 +1,4 @@
-use macroquad::prelude::{screen_height, screen_width, Color, Vec2};
+use macroquad::prelude::{draw_text, screen_height, screen_width, Color, Vec2, WHITE};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use std::f32::consts::PI;
@@ -39,4 +39,12 @@ pub fn random_vec2(min_x: f32, max_x: f32, min_y: f32, max_y: f32) -> Vec2 {
 
 pub fn deg2rad(degrees: f32) -> f32 {
     return degrees * PI / 180.0;
+}
+
+pub fn draw_header(points: i32, lives: i32) {
+    let points_text = format!("Points: {}", points).to_owned();
+    draw_text(&points_text, 0.0, 50.0, 40.0, WHITE);
+
+    let lives_text = format!("Lives: {}", lives).to_owned();
+    draw_text(&lives_text, 0.0, 100.0, 40.0, WHITE);
 }

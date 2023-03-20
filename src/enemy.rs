@@ -26,7 +26,7 @@ impl Movable for Enemy {
     }
 }
 impl Enemy {
-    pub fn new(ship_position: Vec2) -> Self {
+    pub fn new(ship_position: Vec2, points: i32) -> Self {
         // TODO: position of enemy needs to be outside of screen
         let my_position = utils::random_vec2(
             -screen_width(),
@@ -39,7 +39,7 @@ impl Enemy {
             object: Object {
                 position: my_position,
                 direction: my_direction,
-                speed: 2.5,
+                speed: 2.5 + points as f32 / 100.0,
                 size: 30.0,
             },
             dead: false,
@@ -48,8 +48,6 @@ impl Enemy {
     }
 
     pub fn collided(&self, projectile: &Projectile) -> bool {
-        //TODO: smart-ish: round position
-        //TODO: smarter: consider radius of projectile + size of enemy
         let p_max_x = self.object.position.x + self.object.size / 2.0;
         let p_min_x = self.object.position.x - self.object.size / 2.0;
         let p_max_y = self.object.position.y + self.object.size / 2.0;

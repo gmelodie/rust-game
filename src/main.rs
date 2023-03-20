@@ -8,8 +8,12 @@ mod ship;
 
 use enemy::Enemy;
 use ship::Ship;
+use utils::draw_header;
 
-use macroquad::prelude::{is_key_down, is_key_pressed, next_frame, Conf, KeyCode};
+use macroquad::prelude::{
+    draw_text, is_key_down, is_key_pressed, next_frame, screen_height, screen_width, Conf, KeyCode,
+    WHITE,
+};
 
 // make window fullscreen
 fn window_conf() -> Conf {
@@ -49,6 +53,7 @@ async fn main() {
 
     let mut frame_number = 0;
     loop {
+        draw_header(points, ship.lives);
         input.update();
         if is_key_pressed(KeyCode::Q) {
             break;
@@ -70,7 +75,7 @@ async fn main() {
         // new enemy every 100 frames
         // TODO: enemies start slowly and come faster the more points you have (needs points)
         if frame_number % 50 == 0 {
-            enemies.push(Enemy::new(ship.object.position));
+            enemies.push(Enemy::new(ship.object.position, points));
         }
 
         render_one(&mut ship);
@@ -105,10 +110,38 @@ async fn main() {
         projectiles.retain(|p| p.dead == false);
 
         if ship.lives <= 0 {
-            println!("you lost");
             break;
         }
         next_frame().await;
         frame_number += 1;
+    }
+
+    loop {
+        draw_header(points, ship.lives);
+        input.update();
+        if is_key_pressed(KeyCode::Q) {
+            break;
+        }
+
+        // shoot!
+        if input.debounced_is_key_down(KeyCode::Space) {
+            projectiles.push(ship.shoot());
+        }
+
+        // move
+        if is_key_down(KeyCode::Right) {
+            ship.rotate(5.0);
+        }
+        if is_key_down(KeyCode::Left) {
+            ship.rotate(-5.0);
+        }
+        draw_text(
+            "you lost",
+            screen_height() / 2.0,
+            screen_width() / 2.0,
+            100.0,
+            WHITE,
+        );
+        next_frame().await;
     }
 }
