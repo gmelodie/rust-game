@@ -19,6 +19,7 @@ pub struct Object {
 impl Movable for Object {
     fn update(&mut self) {
         self.position += self.speed * self.direction.normalize();
+        self.speed -= 0.005; // speed reduces slowly
     }
 }
 impl Object {

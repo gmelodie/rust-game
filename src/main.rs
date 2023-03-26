@@ -15,11 +15,13 @@ use macroquad::prelude::{
     WHITE,
 };
 
+const MAX_SPEED: f32 = 3.0;
+
 // make window fullscreen
 fn window_conf() -> Conf {
     Conf {
         window_title: "Killer Triangle".to_owned(),
-        fullscreen: false,
+        fullscreen: true,
         ..Default::default()
     }
 }
@@ -66,15 +68,20 @@ async fn main() {
 
         // move
         if is_key_down(KeyCode::Right) {
-            ship.rotate(5.0);
+            ship.rotate(3.0);
         }
         if is_key_down(KeyCode::Left) {
-            ship.rotate(-5.0);
+            ship.rotate(-3.0);
+        }
+        if is_key_down(KeyCode::Up) {
+            if ship.object.speed < MAX_SPEED {
+                ship.object.speed += 0.1;
+            }
         }
 
         // new enemy every 100 frames
         // TODO: enemies start slowly and come faster the more points you have (needs points)
-        if frame_number % 50 == 0 {
+        if frame_number % 20 == 0 {
             enemies.push(Enemy::new(ship.object.position, points));
         }
 
@@ -89,8 +96,6 @@ async fn main() {
                     enemy.dead = true;
                     projectile.dead = true;
                     points += 1;
-                    println!("some dude died");
-                    println!("points: {}", points);
                 }
             }
         }
@@ -100,7 +105,6 @@ async fn main() {
             if ship.collided(enemy) {
                 ship.lives -= 1;
                 enemy.dead = true;
-                println!("hit! center hit! lives: {}", ship.lives);
             }
         }
 
@@ -128,13 +132,6 @@ async fn main() {
             projectiles.push(ship.shoot());
         }
 
-        // move
-        if is_key_down(KeyCode::Right) {
-            ship.rotate(5.0);
-        }
-        if is_key_down(KeyCode::Left) {
-            ship.rotate(-5.0);
-        }
         draw_text(
             "you lost",
             screen_height() / 2.0,
