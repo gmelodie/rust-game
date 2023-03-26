@@ -21,7 +21,7 @@ const MAX_SPEED: f32 = 3.0;
 fn window_conf() -> Conf {
     Conf {
         window_title: "Killer Triangle".to_owned(),
-        fullscreen: true,
+        fullscreen: false,
         ..Default::default()
     }
 }

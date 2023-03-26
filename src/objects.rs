@@ -20,6 +20,9 @@ impl Movable for Object {
     fn update(&mut self) {
         self.position += self.speed * self.direction.normalize();
         self.speed -= 0.005; // speed reduces slowly
+        if self.speed < 0.0 {
+            self.speed = 0.0; // so that speed doesn't become negative
+        }
     }
 }
 impl Object {
