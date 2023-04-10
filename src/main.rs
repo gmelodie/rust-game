@@ -46,7 +46,7 @@ async fn main() {
 
     input.register_key(KeyCode::W);
     input.register_key(KeyCode::A);
-    // input.register_key(KeyCode::S); // no back as of now
+    input.register_key(KeyCode::S);
     input.register_key(KeyCode::D);
     input.register_key(KeyCode::Space);
     input.register_key(KeyCode::Up);
