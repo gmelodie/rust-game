@@ -6,9 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-macroquad = "*"
+instant = "0.1" # lets us use now without stdweb or wasm-bindgen (https://github.com/sebcrozet/instant#using-the-feature-now-without-stdweb-or-wasm-bindgen)
+macroquad = "0.3"
 # rand = "*"
 quad-rand = { version = "0.2", features = ["rand"] }
-console_error_panic_hook = "*"
 
 

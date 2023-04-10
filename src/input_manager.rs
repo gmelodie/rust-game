@@ -1,10 +1,11 @@
+use instant;
 use macroquad::prelude::{is_key_down, KeyCode};
 use std::collections::HashMap;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 struct KeyState {
     first_frame: bool,
-    last_repeated: Instant,
+    last_repeated: instant::Instant,
 }
 
 pub struct InputManager {
@@ -17,7 +18,7 @@ impl Default for KeyState {
     fn default() -> Self {
         Self {
             first_frame: true,
-            last_repeated: Instant::now(),
+            last_repeated: instant::Instant::now(),
         }
     }
 }
@@ -48,7 +49,7 @@ impl InputManager {
         // long enough ago, return true and
         // update last_repeated
         if key_state.last_repeated.elapsed() > Duration::from_secs_f32(KEY_DEBOUNCE_TIME) {
-            key_state.last_repeated = Instant::now();
+            key_state.last_repeated = instant::Instant::now();
             return true;
         }
 
@@ -60,7 +61,7 @@ impl InputManager {
             if !is_key_down(*key) {
                 // reset first frame
                 state.first_frame = true;
-                state.last_repeated = Instant::now();
+                state.last_repeated = instant::Instant::now();
             }
         }
     }
@@ -70,7 +71,7 @@ impl InputManager {
             key,
             KeyState {
                 first_frame: false,
-                last_repeated: Instant::now(),
+                last_repeated: instant::Instant::now(),
             },
         );
     }
