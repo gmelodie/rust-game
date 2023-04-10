@@ -9,4 +9,6 @@ edition = "2021"
 macroquad = "*"
 # rand = "*"
 quad-rand = { version = "0.2", features = ["rand"] }
+console_error_panic_hook = "*"
+
 

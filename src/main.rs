@@ -1,3 +1,5 @@
+extern crate console_error_panic_hook;
+use std::panic;
 mod input_manager;
 mod utils;
 
@@ -39,6 +41,7 @@ fn render_one<T: objects::Renderable>(obj: &mut T) {
 
 #[macroquad::main("game-rust")]
 async fn main() {
+    panic::set_hook(Box::new(console_error_panic_hook::hook));
     let mut input = input_manager::InputManager::new();
 
     input.register_key(KeyCode::W);
