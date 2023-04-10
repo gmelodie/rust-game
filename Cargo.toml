@@ -7,4 +7,6 @@ edition = "2021"
 
 [dependencies]
 macroquad = "*"
-rand = "*"
+# rand = "*"
+quad-rand = { version = "0.2", features = ["rand"] }
+
